@@ -1,0 +1,13 @@
+region,month,disease_name,risk_level,case_count,symptoms,precautions
+Delhi,January,Air Pollution Related Respiratory Issues,High,3200,"Cough and breathing difficulty,Chest tightness,Eye irritation","Use air purifiers,Wear N95 masks,Limit outdoor activities"
+Delhi,January,Dengue Fever,High,890,"High fever and headache,Muscle and joint pain,Skin rash","Eliminate standing water,Use mosquito repellent,Wear protective clothing"
+Delhi,January,Seasonal Flu,Medium,1500,"Cough and sore throat,Body aches,Runny nose","Get vaccinated,Wash hands frequently,Avoid close contact"
+Maharashtra,January,Dengue Fever,High,1240,"High fever and headache,Muscle and joint pain,Skin rash","Eliminate standing water,Use mosquito repellent,Wear protective clothing"
+Maharashtra,January,Malaria,Medium,890,"Fever and chills,Fatigue and weakness,Nausea and vomiting","Use bed nets,Take antimalarial medication,Remove water sources"
+Maharashtra,January,Seasonal Flu,Low,2150,"Cough and sore throat,Body aches,Runny nose","Get vaccinated,Wash hands frequently,Avoid close contact"
+Karnataka,January,Chikungunya,Medium,650,"Joint pain and swelling,High fever,Headache","Control mosquito breeding,Use repellents,Wear long sleeves"
+Karnataka,January,Typhoid,Low,320,"Sustained fever,Stomach pain,Weakness","Drink clean water,Practice good hygiene,Get vaccinated"
+West Bengal,January,Dengue Fever,High,1100,"High fever and headache,Muscle and joint pain,Skin rash","Eliminate standing water,Use mosquito repellent,Wear protective clothing"
+West Bengal,January,Japanese Encephalitis,Medium,450,"High fever,Confusion,Seizures","Get vaccinated,Control mosquito breeding,Use bed nets"
+Rajasthan,January,Heat Stroke,Low,200,"High body temperature,Confusion,Hot dry skin","Stay hydrated,Avoid sun exposure,Use cooling methods"
+Rajasthan,January,Seasonal Flu,Low,800,"Cough and sore throat,Body aches,Runny nose","Get vaccinated,Wash hands frequently,Avoid close contact"
