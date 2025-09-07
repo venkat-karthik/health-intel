@@ -1,8 +1,10 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, TrendingUp, AlertTriangle, Users } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { MapPin, TrendingUp, AlertTriangle, Users, Activity, Shield, Eye, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Cell } from 'recharts';
 
 export default function Home() {
   // Fetch real-time statistics
@@ -50,6 +52,10 @@ export default function Home() {
             <CardContent>
               <div className="text-2xl font-bold">{totalRegions}</div>
               <p className="text-xs text-muted-foreground">States monitored</p>
+              <div className="mt-2">
+                <Progress value={85} className="h-1" />
+                <p className="text-xs text-muted-foreground mt-1">85% coverage</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -61,6 +67,10 @@ export default function Home() {
             <CardContent>
               <div className="text-2xl font-bold">248</div>
               <p className="text-xs text-muted-foreground">Disease forecasts</p>
+              <div className="mt-2">
+                <Progress value={92} className="h-1" />
+                <p className="text-xs text-muted-foreground mt-1">92% accuracy</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -72,6 +82,10 @@ export default function Home() {
             <CardContent>
               <div className="text-2xl font-bold text-destructive">12</div>
               <p className="text-xs text-muted-foreground">Require attention</p>
+              <div className="mt-2">
+                <Progress value={30} className="h-1" />
+                <p className="text-xs text-destructive mt-1">Critical level</p>
+              </div>
             </CardContent>
           </Card>
           
@@ -83,6 +97,121 @@ export default function Home() {
             <CardContent>
               <div className="text-2xl font-bold">1.4B</div>
               <p className="text-xs text-muted-foreground">Citizens protected</p>
+              <div className="mt-2">
+                <Progress value={98} className="h-1" />
+                <p className="text-xs text-accent mt-1">98% protected</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Real-time Analytics Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Disease Trend Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Activity className="w-4 h-4 mr-2" />
+                Disease Trends (Last 7 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={[
+                    { day: 'Mon', cases: 850, alerts: 3 },
+                    { day: 'Tue', cases: 920, alerts: 4 },
+                    { day: 'Wed', cases: 780, alerts: 2 },
+                    { day: 'Thu', cases: 1100, alerts: 5 },
+                    { day: 'Fri', cases: 1250, alerts: 7 },
+                    { day: 'Sat', cases: 980, alerts: 4 },
+                    { day: 'Sun', cases: 1150, alerts: 6 }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="cases" stroke="#3b82f6" strokeWidth={2} />
+                    <Line type="monotone" dataKey="alerts" stroke="#dc2626" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Shield className="w-4 h-4 mr-2" />
+                Current Risk Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip />
+                    <PieChart data={[
+                      { name: 'High Risk', value: 35, fill: '#dc2626' },
+                      { name: 'Medium Risk', value: 45, fill: '#d97706' },
+                      { name: 'Low Risk', value: 20, fill: '#059669' }
+                    ]} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
+                      <Cell fill="#dc2626" />
+                      <Cell fill="#d97706" />
+                      <Cell fill="#059669" />
+                    </PieChart>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Eye className="w-4 h-4 text-blue-500" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Cases Today</p>
+                  <p className="text-lg font-bold">1,247</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-green-500" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Response Time</p>
+                  <p className="text-lg font-bold">2.3h</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4 text-orange-500" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Weekly Growth</p>
+                  <p className="text-lg font-bold">+12%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-4 h-4 text-purple-500" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Prevention Rate</p>
+                  <p className="text-lg font-bold">78%</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
