@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { aiHealthService } from './ai-service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,6 +13,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getHealthPrediction(region: string, month: string): Promise<HealthPrediction | null>;
+  getAIHealthPrediction(region: string, month: string): Promise<HealthPrediction | null>;
 }
 
 export class MemStorage implements IStorage {
@@ -62,6 +64,18 @@ export class MemStorage implements IStorage {
   }
 
   async getHealthPrediction(region: string, month: string): Promise<HealthPrediction | null> {
+    // First try to get AI-powered data
+    try {
+      const aiData = await this.getAIHealthPrediction(region, month);
+      if (aiData && aiData.diseases.length > 0) {
+        console.log(`✨ AI-powered health data retrieved for ${region}`);
+        return aiData;
+      }
+    } catch (error) {
+      console.log(`⚠️  AI service unavailable, falling back to static data for ${region}:`, error);
+    }
+
+    // Fallback to static CSV data
     const filteredData = this.healthData.filter(
       record => 
         record.region?.toLowerCase() === region.toLowerCase() && 
@@ -96,6 +110,15 @@ export class MemStorage implements IStorage {
       month,
       diseases: Array.from(diseaseMap.values()),
     };
+  }
+
+  async getAIHealthPrediction(region: string, month: string): Promise<HealthPrediction | null> {
+    try {
+      return await aiHealthService.getHealthData(region, month);
+    } catch (error) {
+      console.error('Error getting AI health prediction:', error);
+      return null;
+    }
   }
 }
 

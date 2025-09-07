@@ -189,6 +189,39 @@ export default function HealthSnapshot({ data, isLoading, error, selectedState }
     // In a real app, this would set up push notifications or email alerts
     console.log(`Setting up alerts for ${data.region}`);
   };
+
+  const handleRefreshData = async () => {
+    if (!selectedState) return;
+    
+    try {
+      const response = await fetch('/api/refresh-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          region: selectedState,
+          month: 'January' // Could be dynamic
+        })
+      });
+      
+      if (response.ok) {
+        const freshData = await response.json();
+        toast({
+          title: "🤖 AI Data Refreshed",
+          description: `Latest health intelligence gathered for ${selectedState} using real-time web data.`,
+        });
+        // In a real implementation, you'd update the data state here
+        window.location.reload(); // Simple refresh for now
+      } else {
+        throw new Error('Failed to refresh data');
+      }
+    } catch (error) {
+      toast({
+        title: "Refresh Failed", 
+        description: "Could not fetch latest AI health data. Using cached information.",
+        variant: "destructive"
+      });
+    }
+  };
   // Loading State
   if (isLoading) {
     return (
@@ -291,13 +324,20 @@ export default function HealthSnapshot({ data, isLoading, error, selectedState }
             {data.month} 2024 • Comprehensive Analysis
           </p>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          data-testid="button-refresh-data"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span>🤖 AI-Powered</span>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleRefreshData}
+            data-testid="button-refresh-data"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics */}

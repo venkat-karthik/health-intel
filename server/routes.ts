@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { predictionRequestSchema } from "@shared/schema";
+import { aiHealthService } from "./ai-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health prediction endpoint
@@ -37,6 +38,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       "Tamil Nadu", "Gujarat", "Uttar Pradesh", "Punjab", "Kerala"
     ];
     res.json(regions);
+  });
+
+  // AI-powered disease insights endpoint
+  app.post("/api/ai-insights", async (req, res) => {
+    try {
+      const { diseaseName } = req.body;
+      
+      if (!diseaseName || typeof diseaseName !== 'string') {
+        return res.status(400).json({ 
+          error: "Disease name is required"
+        });
+      }
+      
+      const insights = await aiHealthService.generateDiseaseInsights(diseaseName);
+      
+      if (!insights) {
+        return res.status(404).json({ 
+          error: "Could not generate insights for the specified disease"
+        });
+      }
+      
+      res.json({
+        disease: diseaseName,
+        ...insights,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error in /api/ai-insights:", error);
+      res.status(500).json({ 
+        error: "Failed to generate AI insights",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Health data refresh endpoint (triggers AI data collection)
+  app.post("/api/refresh-data", async (req, res) => {
+    try {
+      const { region, month } = predictionRequestSchema.parse(req.body);
+      
+      // Force AI data collection
+      const aiData = await storage.getAIHealthPrediction(region, month);
+      
+      if (!aiData) {
+        return res.status(404).json({ 
+          error: "Could not collect AI health data for the specified region",
+          region,
+          month 
+        });
+      }
+      
+      res.json({
+        ...aiData,
+        dataSource: 'AI-powered',
+        refreshedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error in /api/refresh-data:", error);
+      res.status(500).json({ 
+        error: "Failed to refresh health data",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
   });
 
   const httpServer = createServer(app);
