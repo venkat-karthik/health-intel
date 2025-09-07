@@ -1,0 +1,104 @@
+# Project Overview:
+A full-stack web application designed to be a proactive health intelligence platform for India. It features a secure dashboard for officials and a public-facing portal with an AI-powered predictive map.
+
+## Technology Stack:
+
+Frontend: React, React Router, Three.js/react-three-fiber, Axios, Tailwind CSS
+
+Backend: Python, Flask
+
+AI/ML: Scikit-learn, Pandas
+
+Database (Prototype): A simple CSV file (health_data.csv)
+
+## Phase 1: Backend Setup & API Creation
+(Manual Step 1: Create a project folder named HealthPlatform, and inside it, create a folder named backend.)
+
+(Manual Step 2: Inside backend, create a file named app.py and a dummy data file named health_data.csv.)
+
+Prompt 1.1 (For file: backend/app.py):
+
+"Generate a complete Python Flask server application.
+
+It should import Flask, CORS (to allow the frontend to connect), and pandas.
+
+Enable CORS for all origins.
+
+Create a single API endpoint at /api/predict that accepts POST requests.
+
+The endpoint should read a JSON body containing a 'region' and 'month'.
+
+For this prototype, it should read the health_data.csv file. It will filter this data to find matching entries for the given region and month.
+
+Based on the filtered data, it should formulate and return a JSON response containing a list of predicted diseases. Each disease object in the list must have: name, riskLevel (High/Medium/Low), caseCount (from the data), a symptoms list, and a precautions list.
+
+If no data is found for the region, it should return an appropriate error message.
+
+The server should run on port 5000."
+
+## Phase 2: Frontend Foundation & UI Shell
+(Manual Step 3: In your terminal, inside the HealthPlatform folder, run npx create-react-app frontend.)
+
+(Manual Step 4: Install necessary libraries by running cd frontend and then npm install axios react-router-dom three react-three-fiber drei tailwindcss.)
+
+Prompt 2.1 (For file: frontend/src/App.js):
+
+"Set up the main application shell using React and React Router.
+
+The structure should use a Browser Router.
+
+Create a simple, modern navigation bar at the top of the page. The navbar should have links for 'Home', 'Predictive Map', and 'Report an Issue'.
+
+Define the routes: '/' should go to a HomePage component, '/map' should go to the PredictiveMapPage component, and '/report' should go to the ReportIssuePage component.
+
+Import and render these components within the router structure."
+
+## Phase 3: Core Feature - The 3D Map Page
+(Manual Step 5: Create a new file frontend/src/pages/PredictiveMapPage.jsx.)
+
+Prompt 3.1 (For file: frontend/src/pages/PredictiveMapPage.jsx):
+
+"Create a complete React page component for our predictive map.
+
+The layout should be a two-column grid. The left column (taking up about 60% of the width) will contain the 3D map component. The right column (40% width) will contain the results display component.
+
+Import a component called IndiaMap (which we will create next) for the left column and a component called HealthSnapshot for the right.
+
+Manage the state for the API response data here. Create a state variable called predictionData.
+
+Create a handler function handleStateSelect that takes a state name, calls our backend API at http://localhost:5000/api/predict using axios with the state name and current month, and then sets the predictionData state with the response.
+
+Pass the handleStateSelect function as a prop to IndiaMap and predictionData as a prop to HealthSnapshot."
+
+(Manual Step 6: Create a new file frontend/src/components/IndiaMap.jsx.)
+
+Prompt 3.2 (For file: frontend/src/components/IndiaMap.jsx):
+
+"Create the 3D interactive map component using react-three-fiber and drei.
+
+Set up a Canvas with appropriate camera settings and lighting (ambient and directional).
+
+Enable OrbitControls to allow users to zoom and rotate.
+
+Assume a 3D model of India is available at /india.glb. Load this model using the useGLTF hook.
+
+Iterate through the nodes of the loaded model to make each state a distinct, clickable mesh.
+
+On hover, the state's color should brighten. On click, it must call the onStateSelect prop function, passing its name."
+
+## Phase 4: Displaying the Predictive Data
+(Manual Step 7: Create a new file frontend/src/components/HealthSnapshot.jsx.)
+
+Prompt 4.1 (For file: frontend/src/components/HealthSnapshot.jsx):
+
+"Create the HealthSnapshot component to display the prediction results.
+
+It accepts a prop called data.
+
+If data is null, display a message like: 'Click on a state to view its health forecast.'
+
+If data contains information, display a title like 'Health Snapshot for [Region]'.
+
+Map over the list of diseases in the data prop. For each disease, render a styled card using Tailwind CSS.
+
+Each card must display the disease name, its risk level (e.g., in a colored badge), the average case count, and two bulleted lists: one for 'Symptoms' and one for 'Precautions'."
