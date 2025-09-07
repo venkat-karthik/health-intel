@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/layout/navigation";
 import Home from "@/pages/home";
-import PredictiveMap from "@/pages/predictive-map";
+import MapPage from "@/pages/map";
 import ReportIssue from "@/pages/report-issue";
 import NotFound from "@/pages/not-found";
 
@@ -16,7 +16,7 @@ function Router() {
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
-          <Route path="/map" component={PredictiveMap} />
+          <Route path="/map" component={MapPage} />
           <Route path="/report" component={ReportIssue} />
           <Route component={NotFound} />
         </Switch>

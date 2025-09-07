@@ -39,14 +39,14 @@ export class PerplexityHealthService implements AIHealthService {
           messages: [
             {
               role: 'system',
-              content: 'You are a health data analyst. Provide accurate, current health information from reliable medical sources. Format responses as structured JSON data.'
+              content: 'You are a health data analyst. Provide accurate, current health information from reliable medical sources.'
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          max_tokens: 1000,
+          max_tokens: 500,
           temperature: 0.2,
           top_p: 0.9,
           return_images: false,
