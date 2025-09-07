@@ -3,77 +3,101 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Plus, Minus, Home } from "lucide-react";
 
-// Interactive map component using a simple grid layout
-function IndiaMapGrid({ onStateClick, isLoading }: { onStateClick: (state: string) => void; isLoading: boolean }) {
+// Interactive India map with SVG visualization
+function IndiaMapSVG({ onStateClick, isLoading }: { onStateClick: (state: string) => void; isLoading: boolean }) {
   const [hoveredState, setHoveredState] = useState<string | null>(null);
 
-  // Sample state data with grid positions and risk levels
+  // Sample state data with risk levels
   const states = [
-    { name: "Delhi", gridRow: 2, gridCol: 3, risk: "high", displayName: "Delhi" },
-    { name: "Maharashtra", gridRow: 4, gridCol: 2, risk: "high", displayName: "Maharashtra" },
-    { name: "Karnataka", gridRow: 6, gridCol: 2, risk: "medium", displayName: "Karnataka" },
-    { name: "West Bengal", gridRow: 3, gridCol: 5, risk: "high", displayName: "West Bengal" },
-    { name: "Rajasthan", gridRow: 3, gridCol: 1, risk: "low", displayName: "Rajasthan" },
-    { name: "Tamil Nadu", gridRow: 7, gridCol: 3, risk: "medium", displayName: "Tamil Nadu" },
-    { name: "Gujarat", gridRow: 4, gridCol: 1, risk: "low", displayName: "Gujarat" },
-    { name: "Uttar Pradesh", gridRow: 2, gridCol: 4, risk: "medium", displayName: "Uttar Pradesh" },
+    { name: "Delhi", risk: "high", displayName: "Delhi", path: "M300,180 L320,180 L320,200 L300,200 Z" },
+    { name: "Maharashtra", risk: "high", displayName: "Maharashtra", path: "M200,280 L280,280 L280,350 L200,350 Z" },
+    { name: "Karnataka", risk: "medium", displayName: "Karnataka", path: "M220,350 L280,350 L280,420 L220,420 Z" },
+    { name: "West Bengal", risk: "high", displayName: "West Bengal", path: "M400,220 L460,220 L460,280 L400,280 Z" },
+    { name: "Rajasthan", risk: "low", displayName: "Rajasthan", path: "M150,120 L280,120 L280,220 L150,220 Z" },
+    { name: "Tamil Nadu", risk: "medium", displayName: "Tamil Nadu", path: "M240,420 L300,420 L300,480 L240,480 Z" },
+    { name: "Gujarat", risk: "low", displayName: "Gujarat", path: "M120,220 L200,220 L200,300 L120,300 Z" },
+    { name: "Uttar Pradesh", risk: "medium", displayName: "Uttar Pradesh", path: "M280,120 L380,120 L380,200 L280,200 Z" },
   ];
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case "high": return "bg-red-500 border-red-600";
-      case "medium": return "bg-orange-500 border-orange-600";
-      case "low": return "bg-green-500 border-green-600";
-      default: return "bg-gray-500 border-gray-600";
+      case "high": return "#dc2626";
+      case "medium": return "#d97706";
+      case "low": return "#059669";
+      default: return "#6b7280";
     }
   };
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-8">
-      {/* India Map Grid */}
-      <div className="relative" style={{ width: '500px', height: '400px' }}>
-        {/* Grid container */}
-        <div className="absolute inset-0 grid grid-cols-6 grid-rows-8 gap-2">
+      {/* SVG India Map */}
+      <div className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-lg shadow-lg border border-border" style={{ width: '600px', height: '500px' }}>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 600 500"
+          className="absolute inset-0"
+        >
+          {/* Map background */}
+          <rect width="600" height="500" fill="#f8fafc" rx="8" />
+          
+          {/* State regions */}
           {states.map((state) => (
-            <div
-              key={state.name}
-              className={`
-                relative flex items-center justify-center rounded-lg cursor-pointer
-                transition-all duration-200 transform hover:scale-110 hover:z-10
-                border-2 shadow-sm
-                ${getRiskColor(state.risk)}
-                ${hoveredState === state.name ? 'scale-110 shadow-lg' : ''}
-                ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-              `}
-              style={{
-                gridRow: state.gridRow,
-                gridColumn: state.gridCol,
-                minHeight: '40px',
-                minWidth: '60px'
-              }}
-              onClick={() => !isLoading && onStateClick(state.name)}
-              onMouseEnter={() => !isLoading && setHoveredState(state.name)}
-              onMouseLeave={() => setHoveredState(null)}
-              data-testid={`state-${state.name.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              <span className="text-white text-xs font-medium text-center px-1">
-                {state.displayName}
-              </span>
+            <g key={state.name}>
+              <path
+                d={state.path}
+                fill={getRiskColor(state.risk)}
+                stroke="#ffffff"
+                strokeWidth="2"
+                className={`
+                  cursor-pointer transition-all duration-200
+                  ${hoveredState === state.name ? 'opacity-80 drop-shadow-lg' : 'opacity-100'}
+                  ${isLoading ? 'cursor-not-allowed opacity-50' : ''}
+                `}
+                onClick={() => !isLoading && onStateClick(state.name)}
+                onMouseEnter={() => !isLoading && setHoveredState(state.name)}
+                onMouseLeave={() => setHoveredState(null)}
+                data-testid={`state-${state.name.toLowerCase().replace(/\s+/g, '-')}`}
+              />
               
-              {/* Tooltip */}
-              {hoveredState === state.name && (
-                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-20">
-                  <Card className="shadow-lg border-border">
-                    <CardContent className="p-2">
-                      <p className="text-sm font-medium text-foreground">{state.displayName}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{state.risk} Risk</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-            </div>
+              {/* State labels */}
+              <text
+                x={state.path.includes('M300,180') ? '310' : state.path.includes('M200,280') ? '240' : state.path.includes('M220,350') ? '250' : state.path.includes('M400,220') ? '430' : state.path.includes('M150,120') ? '215' : state.path.includes('M240,420') ? '270' : state.path.includes('M120,220') ? '160' : '330'}
+                y={state.path.includes('M300,180') ? '195' : state.path.includes('M200,280') ? '315' : state.path.includes('M220,350') ? '385' : state.path.includes('M400,220') ? '255' : state.path.includes('M150,120') ? '175' : state.path.includes('M240,420') ? '455' : state.path.includes('M120,220') ? '265' : '165'}
+                fill="white"
+                fontSize="10"
+                fontWeight="600"
+                textAnchor="middle"
+                className="pointer-events-none select-none"
+              >
+                {state.displayName}
+              </text>
+            </g>
           ))}
-        </div>
+          
+          {/* Map title */}
+          <text x="300" y="30" fill="#1f2937" fontSize="18" fontWeight="bold" textAnchor="middle">
+            India Health Surveillance Map
+          </text>
+          <text x="300" y="50" fill="#6b7280" fontSize="12" textAnchor="middle">
+            Real-time Disease Risk Assessment
+          </text>
+        </svg>
+        
+        {/* Tooltip */}
+        {hoveredState && (
+          <div className="absolute top-4 left-4 z-20">
+            <Card className="shadow-lg border-border bg-card/95 backdrop-blur-sm">
+              <CardContent className="p-3">
+                <p className="text-sm font-medium text-foreground">{hoveredState}</p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {states.find(s => s.name === hoveredState)?.risk} Risk Level
+                </p>
+                <p className="text-xs text-primary mt-1">Click to view details</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
         
         {/* Loading overlay */}
         {isLoading && (
@@ -86,6 +110,12 @@ function IndiaMapGrid({ onStateClick, isLoading }: { onStateClick: (state: strin
             </div>
           </div>
         )}
+        
+        {/* Real-time indicator */}
+        <div className="absolute top-4 right-4 flex items-center space-x-2 bg-card/95 backdrop-blur-sm rounded-lg px-3 py-1 border border-border">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs text-muted-foreground font-medium">LIVE</span>
+        </div>
       </div>
     </div>
   );
@@ -121,7 +151,7 @@ export default function IndiaMap3D({ onStateSelect, isLoading = false }: IndiaMa
           className="transition-transform duration-300 ease-in-out"
           style={{ transform: `scale(${zoom})` }}
         >
-          <IndiaMapGrid onStateClick={onStateSelect} isLoading={isLoading} />
+          <IndiaMapSVG onStateClick={onStateSelect} isLoading={isLoading} />
         </div>
         
         {/* Map Controls */}

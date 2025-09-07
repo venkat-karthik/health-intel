@@ -2,8 +2,21 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, TrendingUp, AlertTriangle, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
+  // Fetch real-time statistics
+  const { data: regions } = useQuery({
+    queryKey: ['/api/regions'],
+    queryFn: async () => {
+      const response = await fetch('/api/regions');
+      return response.json();
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const totalRegions = regions?.length || 10;
+  const currentTime = new Date().toLocaleString();
   return (
     <div className="min-h-screen bg-background">
       {/* Dashboard Header */}
@@ -16,7 +29,7 @@ export default function Home() {
             </div>
             <div className="mt-4 sm:mt-0 flex items-center space-x-3">
               <div className="text-sm text-muted-foreground">
-                Last updated: {new Date().toLocaleString()}
+                Last updated: {currentTime}
               </div>
               <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
               <span className="text-xs text-accent font-medium">LIVE</span>
@@ -35,8 +48,8 @@ export default function Home() {
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">36</div>
-              <p className="text-xs text-muted-foreground">States and UTs</p>
+              <div className="text-2xl font-bold">{totalRegions}</div>
+              <p className="text-xs text-muted-foreground">States monitored</p>
             </CardContent>
           </Card>
           

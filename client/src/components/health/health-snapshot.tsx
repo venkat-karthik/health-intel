@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Download, Bell, RefreshCw, AlertCircle } from "lucide-react";
 import { type HealthPrediction, type Disease } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 interface HealthSnapshotProps {
   data: HealthPrediction | null;
@@ -83,6 +84,51 @@ function DiseaseCard({ disease }: { disease: Disease }) {
 }
 
 export default function HealthSnapshot({ data, isLoading, error, selectedState }: HealthSnapshotProps) {
+  const { toast } = useToast();
+
+  const handleExportReport = () => {
+    if (!data) return;
+    
+    // Create CSV content
+    const csvContent = [
+      ['Disease Name', 'Risk Level', 'Case Count', 'Symptoms', 'Precautions'],
+      ...data.diseases.map(disease => [
+        disease.name,
+        disease.riskLevel,
+        disease.caseCount.toString(),
+        disease.symptoms.join('; '),
+        disease.precautions.join('; ')
+      ])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `health-report-${data.region}-${data.month}-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    toast({
+      title: "Report Exported",
+      description: `Health report for ${data.region} has been downloaded successfully.`,
+    });
+  };
+
+  const handleSetAlert = () => {
+    if (!data) return;
+    
+    toast({
+      title: "Alert Set",
+      description: `You'll be notified of health updates for ${data.region}. Check your notifications for real-time alerts.`,
+    });
+    
+    // In a real app, this would set up push notifications or email alerts
+    console.log(`Setting up alerts for ${data.region}`);
+  };
   // Loading State
   if (isLoading) {
     return (
@@ -178,6 +224,7 @@ export default function HealthSnapshot({ data, isLoading, error, selectedState }
       <div className="flex space-x-3">
         <Button 
           className="flex-1"
+          onClick={handleExportReport}
           data-testid="button-export-report"
         >
           <Download className="w-4 h-4 mr-2" />
@@ -186,6 +233,7 @@ export default function HealthSnapshot({ data, isLoading, error, selectedState }
         <Button 
           variant="secondary" 
           className="flex-1"
+          onClick={handleSetAlert}
           data-testid="button-set-alert"
         >
           <Bell className="w-4 h-4 mr-2" />

@@ -53,9 +53,6 @@ export default function Navigation() {
             >
               <Bell className="w-4 h-4" />
             </Button>
-            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-muted-foreground" />
-            </div>
           </div>
         </div>
       </div>
