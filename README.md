@@ -13,3 +13,9 @@ AI-powered health surveillance system for India with real-time disease predictio
 - Express.js backend
 - Perplexity AI integration
 - Tailwind CSS + shadcn/ui
+## Quick Start
+
+npm install
+npm run dev
+
+Visit http://localhost:5000
