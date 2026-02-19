@@ -53,25 +53,33 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
   }, [selectedState]);
 
   const getAIResponse = async (userMessage: string): Promise<string> => {
-    // Simulate AI processing with predefined intelligent responses
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('disease') && selectedState) {
-      try {
-        const response = await fetch('/api/ai-insights', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ diseaseName: 'Dengue Fever' })
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          return `🔬 **AI Health Analysis for ${selectedState}:**\n\n**Top Diseases:** Dengue Fever, Seasonal Flu, Malaria\n\n**Symptoms to Watch:**\n${data.symptoms?.map((s: string) => `• ${s}`).join('\n') || '• High fever\n• Severe headache\n• Body aches'}\n\n**Prevention Measures:**\n${data.precautions?.map((p: string) => `• ${p}`).join('\n') || '• Use mosquito repellent\n• Keep surroundings clean'}\n\n**Risk Level:** ${data.riskLevel || 'Medium'}\n**Transmission Rate:** ${data.transmissionRate || 45}%\n\n*Data sourced from live web intelligence*`;
-        }
-      } catch (error) {
-        console.error('AI API Error:', error);
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: userMessage,
+          selectedState: selectedState 
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
       }
+
+      const data = await response.json();
+      return data.response || "I couldn't generate a response. Please try again.";
+    } catch (error) {
+      console.error('AI API Error:', error);
+      
+      // Fallback to local responses if API fails
+      return getFallbackResponse(userMessage);
     }
+  };
+
+  const getFallbackResponse = (userMessage: string): string => {
+    // Fallback responses when API is unavailable
+    const lowerMessage = userMessage.toLowerCase();
     
     if (lowerMessage.includes('symptom')) {
       return `🩺 **Common Disease Symptoms in India:**\n\n**Dengue:** High fever, severe headache, pain behind eyes, muscle pain\n**Malaria:** Fever with chills, sweating, headache, nausea\n**Chikungunya:** Sudden fever, joint pain, muscle pain, headache\n**Typhoid:** Prolonged fever, headache, weakness, stomach pain\n\n*Would you like specific prevention tips for any of these?*`;
@@ -168,25 +176,24 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
   };
 
   return (
-    <Card className={cn("flex flex-col h-[600px] bg-white dark:bg-slate-800", className)}>
+    <Card className={cn("flex flex-col h-[580px] bg-white dark:bg-slate-800 shadow-xl", className)}>
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
-            <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+      <div className="flex items-center gap-3 p-3 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-800">
+        <div className="flex items-center gap-2 flex-1">
+          <div className="p-2 bg-blue-500 rounded-full">
+            <Bot className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <h3 className="font-semibold text-lg">AI Health Assistant</h3>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Live AI Intelligence</span>
-              <Sparkles className="w-3 h-3" />
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm">AI Health Assistant</h3>
+            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Live Intelligence</span>
             </div>
           </div>
         </div>
         
         {selectedState && (
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="text-xs">
             <MapPin className="w-3 h-3 mr-1" />
             {selectedState}
           </Badge>
@@ -194,23 +201,23 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3" ref={scrollAreaRef}>
+        <div className="space-y-3">
           {messages.map((message) => (
             <div
               key={message.id}
               className={cn(
-                "flex gap-3",
+                "flex gap-2",
                 message.type === 'user' ? "justify-end" : "justify-start"
               )}
             >
               {message.type === 'bot' && (
                 <div className="flex-shrink-0">
-                  <div className="p-1.5 bg-blue-100 dark:bg-blue-900 rounded-full">
+                  <div className="p-1 bg-blue-100 dark:bg-blue-900 rounded-full">
                     {message.isTyping ? (
-                      <Activity className="w-4 h-4 text-blue-600 animate-pulse" />
+                      <Activity className="w-3 h-3 text-blue-600 animate-pulse" />
                     ) : (
-                      <Bot className="w-4 h-4 text-blue-600" />
+                      <Bot className="w-3 h-3 text-blue-600" />
                     )}
                   </div>
                 </div>
@@ -218,7 +225,7 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
               
               <div
                 className={cn(
-                  "max-w-[80%] rounded-lg px-4 py-3",
+                  "max-w-[85%] rounded-lg px-3 py-2",
                   message.type === 'user'
                     ? "bg-blue-600 text-white ml-auto"
                     : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100"
@@ -227,27 +234,27 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
                 {message.isTyping ? (
                   <div className="flex items-center gap-1">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-sm text-slate-500 ml-2">{message.content}</span>
+                    <span className="text-xs text-slate-500 ml-2">{message.content}</span>
                   </div>
                 ) : (
-                  <div className="text-sm whitespace-pre-wrap">
+                  <div className="text-xs whitespace-pre-wrap leading-relaxed">
                     {formatMessage(message.content)}
                   </div>
                 )}
                 
-                <div className="text-xs opacity-60 mt-2">
+                <div className="text-[10px] opacity-60 mt-1">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
               
               {message.type === 'user' && (
                 <div className="flex-shrink-0">
-                  <div className="p-1.5 bg-slate-200 dark:bg-slate-600 rounded-full">
-                    <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                  <div className="p-1 bg-slate-200 dark:bg-slate-600 rounded-full">
+                    <User className="w-3 h-3 text-slate-600 dark:text-slate-300" />
                   </div>
                 </div>
               )}
@@ -257,35 +264,36 @@ export function AIHealthChatbot({ selectedState, className }: AIHealthChatbotPro
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 border-t">
+      <div className="p-3 border-t bg-slate-50 dark:bg-slate-900">
         <div className="flex gap-2">
           <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask about diseases, symptoms, prevention, or health trends..."
-            className="flex-1"
+            placeholder="Ask about diseases, symptoms, or prevention..."
+            className="flex-1 text-sm h-9"
             disabled={isLoading}
             data-testid="input-chat-message"
           />
           <Button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
-            size="icon"
+            size="sm"
+            className="h-9 px-3"
             data-testid="button-send-message"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3.5 h-3.5" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+        <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500">
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
-            <span>Real-time data</span>
+            <Sparkles className="w-2.5 h-2.5" />
+            <span>AI-powered</span>
           </div>
           <div className="flex items-center gap-1">
-            <Sparkles className="w-3 h-3" />
-            <span>AI-powered insights</span>
+            <TrendingUp className="w-2.5 h-2.5" />
+            <span>Real-time data</span>
           </div>
         </div>
       </div>
