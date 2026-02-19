@@ -246,11 +246,11 @@ export function DetailedIndiaMap({ onStateSelect, selectedState, className }: De
   };
 
   return (
-    <div className={cn("relative w-full h-full bg-slate-50 dark:bg-slate-900 rounded-lg overflow-hidden", className)}>
+    <div className={cn("relative w-full h-full min-h-[400px] bg-slate-50 dark:bg-slate-900 rounded-lg overflow-auto", className)}>
       <svg
         viewBox="0 0 450 500"
-        className="w-full h-full"
-        style={{ maxWidth: '100%', height: 'auto' }}
+        className="w-full h-auto min-h-[400px]"
+        preserveAspectRatio="xMidYMid meet"
       >
         {/* Background */}
         <rect width="450" height="500" fill="currentColor" className="text-slate-100 dark:text-slate-800" />
@@ -360,29 +360,29 @@ export function DetailedIndiaMap({ onStateSelect, selectedState, className }: De
       </svg>
 
       {/* Legend */}
-      <div className="absolute top-4 right-4 bg-white dark:bg-slate-800 rounded-lg p-3 shadow-lg border">
-        <h4 className="font-semibold text-sm mb-2">Risk Levels</h4>
+      <div className="absolute top-2 right-2 bg-white dark:bg-slate-800 rounded-lg p-2 shadow-lg border text-xs">
+        <h4 className="font-semibold text-xs mb-1.5">Risk Levels</h4>
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span>High Risk</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-red-500 rounded"></div>
+            <span className="text-[10px]">High Risk</span>
           </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 bg-orange-500 rounded"></div>
-            <span>Medium Risk</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-orange-500 rounded"></div>
+            <span className="text-[10px]">Medium</span>
           </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span>Low Risk</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-green-500 rounded"></div>
+            <span className="text-[10px]">Low Risk</span>
           </div>
         </div>
       </div>
 
       {/* State hover tooltip */}
       {hoveredState && (
-        <div className="absolute bottom-4 left-4 bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium">
+        <div className="absolute bottom-2 left-2 bg-slate-900 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium shadow-lg">
           {hoveredState}
-          <div className="text-xs text-slate-300 mt-1">Click for AI health insights</div>
+          <div className="text-[10px] text-slate-300 mt-0.5">Click for insights</div>
         </div>
       )}
     </div>
