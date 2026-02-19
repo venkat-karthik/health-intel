@@ -73,6 +73,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI chatbot endpoint
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, selectedState } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ 
+          error: "Message is required"
+        });
+      }
+      
+      const response = await aiHealthService.chatQuery(message, selectedState);
+      
+      res.json({
+        response,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error in /api/chat:", error);
+      res.status(500).json({ 
+        error: "Failed to process chat message",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Health data refresh endpoint (triggers AI data collection)
   app.post("/api/refresh-data", async (req, res) => {
     try {
