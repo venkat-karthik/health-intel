@@ -33,13 +33,22 @@ export class MemStorage implements IStorage {
       const headers = lines[0].split(',');
       
       this.healthData = lines.slice(1).map(line => {
-        const values = line.split(',');
+        // Handle CSV with quoted fields containing commas
+        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+        const values = line.split(regex);
         const record: any = {};
         headers.forEach((header, index) => {
-          record[header.trim()] = values[index]?.trim() || '';
+          let value = values[index]?.trim() || '';
+          // Remove surrounding quotes if present
+          if (value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1);
+          }
+          record[header.trim()] = value;
         });
         return record;
       });
+      
+      console.log(`✅ Loaded ${this.healthData.length} health records from CSV`);
     } catch (error) {
       console.error('Error loading health data CSV:', error);
       this.healthData = [];
@@ -64,18 +73,8 @@ export class MemStorage implements IStorage {
   }
 
   async getHealthPrediction(region: string, month: string): Promise<HealthPrediction | null> {
-    // First try to get AI-powered data
-    try {
-      const aiData = await this.getAIHealthPrediction(region, month);
-      if (aiData && aiData.diseases.length > 0) {
-        console.log(`✨ AI-powered health data retrieved for ${region}`);
-        return aiData;
-      }
-    } catch (error) {
-      console.log(`⚠️  AI service unavailable, falling back to static data for ${region}:`, error);
-    }
-
-    // Fallback to static CSV data
+    // Use CSV data directly for faster response
+    // AI features are available through the chatbot
     const filteredData = this.healthData.filter(
       record => 
         record.region?.toLowerCase() === region.toLowerCase() && 
