@@ -9,6 +9,7 @@ export interface AIHealthService {
     riskLevel: 'High' | 'Medium' | 'Low';
     caseCount: number;
   } | null>;
+  chatQuery(message: string, selectedState?: string | null): Promise<string>;
 }
 
 export class PerplexityHealthService implements AIHealthService {
@@ -35,28 +36,19 @@ export class PerplexityHealthService implements AIHealthService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.1-sonar-small-128k-online',
+          model: 'sonar',
           messages: [
-            {
-              role: 'system',
-              content: 'You are a health data analyst. Provide accurate, current health information from reliable medical sources.'
-            },
             {
               role: 'user',
               content: prompt
             }
-          ],
-          max_tokens: 500,
-          temperature: 0.2,
-          top_p: 0.9,
-          return_images: false,
-          return_related_questions: false,
-          search_recency_filter: 'month',
-          stream: false
+          ]
         })
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Perplexity API error response:', errorText);
         throw new Error(`Perplexity API error: ${response.status}`);
       }
 
@@ -236,6 +228,36 @@ export class PerplexityHealthService implements AIHealthService {
     };
 
     return regionDiseases[region] || ['Dengue Fever', 'Seasonal Influenza', 'Malaria', 'Typhoid'];
+  }
+
+  async chatQuery(message: string, selectedState?: string | null): Promise<string> {
+    if (!this.apiKey) {
+      return "I'm currently unable to access real-time health data. Please check that the Perplexity API key is configured.";
+    }
+
+    const contextPrompt = selectedState 
+      ? `The user is asking about health information for ${selectedState}, India. `
+      : 'The user is asking about health information in India. ';
+
+    const prompt = contextPrompt + `User question: ${message}
+
+Please provide accurate, helpful health information based on current medical knowledge and data. 
+Focus on:
+- Disease information and symptoms
+- Prevention and precautions
+- Current health trends in India
+- Risk assessments
+- Actionable health advice
+
+Keep the response concise, informative, and formatted with clear sections using markdown.`;
+
+    try {
+      const response = await this.queryPerplexity(prompt);
+      return response || "I couldn't generate a response. Please try again.";
+    } catch (error) {
+      console.error('Error in chat query:', error);
+      return "I'm having trouble accessing health data right now. Please try again in a moment.";
+    }
   }
 }
 
